@@ -41,7 +41,7 @@ CREATE TABLE coffee_shop."users" (
 CREATE TABLE coffee_shop."orders" (
 	order_id INTEGER NOT NULL,
 	total NUMERIC NOT NULL,
-	state order_state NOT NULL,
+	state coffee_shop."order_state" NOT NULL,
 	issue_date DATE NOT NULL,
 	user_id INTEGER NOT NULL,
 	PRIMARY KEY (order_id),
