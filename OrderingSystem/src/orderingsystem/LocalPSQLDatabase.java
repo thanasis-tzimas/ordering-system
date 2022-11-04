@@ -31,6 +31,7 @@ public class LocalPSQLDatabase {
         try {
             this.conn = DriverManager.getConnection(this.url, this.username,
                     this.password);
+            System.out.println("Connection established to: " + this.url);
             this.isConnected = true;
         } catch (SQLException e) {
             System.out.println("Connection to: " + this.url + " has failed!");

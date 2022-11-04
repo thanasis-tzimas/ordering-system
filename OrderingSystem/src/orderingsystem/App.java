@@ -4,6 +4,10 @@
  */
 package orderingsystem;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author thanasis
@@ -192,7 +196,7 @@ public class App extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws ClassNotFoundException, SQLException {
         /* Initialise server connection*/
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -217,13 +221,18 @@ public class App extends javax.swing.JFrame {
         }
         //</editor-fold>
 
+        LocalPSQLDatabase db = new LocalPSQLDatabase("dblabs.iee.ihu.gr", "5432",
+                "it185287", "it185287", "AhoyScientist!0");
+        db.establishConnection();
+        db.getConn().close();
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             new App().setVisible(true);
         });
     }
     
-    private LocalPSQLDatabase database;
+    static LocalPSQLDatabase database;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane ActiveOrdersScrollPane;
