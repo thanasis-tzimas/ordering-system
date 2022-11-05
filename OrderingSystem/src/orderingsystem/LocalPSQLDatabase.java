@@ -78,8 +78,6 @@ public class LocalPSQLDatabase {
         this.conn = conn;
     }
     
-    
-    
     public String getUrl() {
         return url;
     }
@@ -104,5 +102,9 @@ public class LocalPSQLDatabase {
         this.password = password;
     }
     
+    void closeConnection() throws SQLException {
+        System.out.println("Connection to: "+this.url+", has been closed.");
+        this.conn.close();
+    }
     
 }

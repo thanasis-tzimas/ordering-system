@@ -4,9 +4,12 @@
  */
 package orderingsystem;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -32,110 +35,136 @@ public class App extends javax.swing.JFrame {
     private void initComponents() {
 
         NewOrderWindow = new javax.swing.JFrame();
-        CategoryComboBox = new javax.swing.JComboBox<>();
-        CategoryLabel = new javax.swing.JLabel();
-        AddOrderButton = new javax.swing.JToggleButton();
-        CancelOrderButton = new javax.swing.JToggleButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jLabel1 = new javax.swing.JLabel();
-        jSpinner1 = new javax.swing.JSpinner();
-        jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        NewOrderTable = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
+        AddProductToTableButton = new javax.swing.JButton();
+        CancelAddOrder = new javax.swing.JButton();
+        ProceedOrderButton = new javax.swing.JButton();
+        CategoriesComboBox = new javax.swing.JComboBox<>();
+        ProductComboBox = new javax.swing.JComboBox<>();
+        AmountSpinner = new javax.swing.JSpinner();
         Dashboard = new javax.swing.JTabbedPane();
         ActiveOrdersScrollPane = new javax.swing.JScrollPane();
         ActiveOrdersTable = new javax.swing.JTable();
         UtilityMenu = new javax.swing.JMenuBar();
         NewMenu = new javax.swing.JMenu();
-        NewOriderButton = new javax.swing.JMenuItem();
+        NewOrderButton = new javax.swing.JMenuItem();
 
         NewOrderWindow.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         NewOrderWindow.setTitle("Add a new order");
 
-        CategoryComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        NewOrderTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
 
-        CategoryLabel.setText("Choose a category:");
+            },
+            new String [] {
+                "Product Name", "Cost", "Amount"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, true, false
+            };
 
-        AddOrderButton.setText("Add");
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(NewOrderTable);
 
-        CancelOrderButton.setText("Cancel");
-        CancelOrderButton.addActionListener(new java.awt.event.ActionListener() {
+        AddProductToTableButton.setText("Add Product");
+        AddProductToTableButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CancelOrderButtonActionPerformed(evt);
+                AddProductToTableButtonActionPerformed(evt);
             }
         });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        CancelAddOrder.setText("Cancel");
+        CancelAddOrder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CancelAddOrderActionPerformed(evt);
+            }
+        });
 
-        jLabel1.setText("Choose a product:");
+        ProceedOrderButton.setText("Proceed");
+        ProceedOrderButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ProceedOrderButtonActionPerformed(evt);
+            }
+        });
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
+        CategoriesComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        CategoriesComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                CategoriesComboBoxItemStateChanged(evt);
+            }
+        });
 
-        jLabel2.setText("Amount:");
+        ProductComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jTextField1.setText("0.0");
+        AmountSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
 
-        jLabel3.setText("Total due:");
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(ProceedOrderButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(CancelAddOrder)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 66, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(AddProductToTableButton)
+                                    .addComponent(CategoriesComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(64, 64, 64))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(ProductComboBox, 0, 108, Short.MAX_VALUE)
+                                    .addComponent(AmountSpinner))
+                                .addContainerGap())))))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(63, 63, 63)
+                .addComponent(CategoriesComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ProductComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(AmountSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 76, Short.MAX_VALUE)
+                .addComponent(AddProductToTableButton)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CancelAddOrder)
+                    .addComponent(ProceedOrderButton))
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout NewOrderWindowLayout = new javax.swing.GroupLayout(NewOrderWindow.getContentPane());
         NewOrderWindow.getContentPane().setLayout(NewOrderWindowLayout);
         NewOrderWindowLayout.setHorizontalGroup(
             NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(NewOrderWindowLayout.createSequentialGroup()
-                .addGap(50, 50, 50)
-                .addGroup(NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(CategoryLabel)
-                    .addComponent(jLabel1)
-                    .addGroup(NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel2)
-                        .addComponent(AddOrderButton))
-                    .addComponent(jLabel3))
-                .addGroup(NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(NewOrderWindowLayout.createSequentialGroup()
-                        .addGap(24, 24, 24)
-                        .addComponent(CancelOrderButton))
-                    .addGroup(NewOrderWindowLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField1)
-                            .addComponent(jSpinner1)
-                            .addComponent(jComboBox1, 0, 155, Short.MAX_VALUE)
-                            .addComponent(CategoryComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(52, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, NewOrderWindowLayout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         NewOrderWindowLayout.setVerticalGroup(
             NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(NewOrderWindowLayout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addGroup(NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(CategoryComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(CategoryLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
-                .addGroup(NewOrderWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(AddOrderButton)
-                    .addComponent(CancelOrderButton))
-                .addGap(35, 35, 35))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Ordering System I");
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                formWindowClosing(evt);
-            }
-        });
 
         ActiveOrdersTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -154,13 +183,13 @@ public class App extends javax.swing.JFrame {
 
         NewMenu.setText("New");
 
-        NewOriderButton.setText("New order");
-        NewOriderButton.addActionListener(new java.awt.event.ActionListener() {
+        NewOrderButton.setText("New order");
+        NewOrderButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                NewOriderButtonActionPerformed(evt);
+                NewOrderButtonActionPerformed(evt);
             }
         });
-        NewMenu.add(NewOriderButton);
+        NewMenu.add(NewOrderButton);
 
         UtilityMenu.add(NewMenu);
 
@@ -180,18 +209,105 @@ public class App extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void NewOriderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NewOriderButtonActionPerformed
+    private void NewOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NewOrderButtonActionPerformed
         NewOrderWindow.pack();
         NewOrderWindow.setVisible(true);
-    }//GEN-LAST:event_NewOriderButtonActionPerformed
+        // Get categories
+        try {
+            CategoriesComboBox.removeAllItems();
+            Statement st = database.getConn().createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM categories;");
+            while(rs.next()) {
+                CategoriesComboBox.addItem(rs.getString(1));
+            }
+            CategoriesComboBox.setSelectedIndex(0);
+            ProductComboBox.removeAllItems();
+            // Capitalize first letter
+            String s = CategoriesComboBox.getSelectedItem()
+                    .toString()
+                    .substring(0, 1)
+                    .toUpperCase() + CategoriesComboBox.getSelectedItem()
+                            .toString()
+                            .substring(1);
+            rs = st.executeQuery("SELECT product_name FROM product"
+                    + " WHERE category_name = '"+s+"';");
+            while(rs.next()) {
+                ProductComboBox.addItem(rs.getString(1));
+            }
+            ProductComboBox.setSelectedIndex(0);
+            rs.close();
+            st.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_NewOrderButtonActionPerformed
 
-    private void CancelOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelOrderButtonActionPerformed
+    private void ProceedOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedOrderButtonActionPerformed
+        
+    }//GEN-LAST:event_ProceedOrderButtonActionPerformed
+
+    private void CancelAddOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelAddOrderActionPerformed
+        try {
+            database.closeConnection();
+        } catch (SQLException ex) {
+            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+        }
         NewOrderWindow.dispose();
-    }//GEN-LAST:event_CancelOrderButtonActionPerformed
+    }//GEN-LAST:event_CancelAddOrderActionPerformed
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+    private void CategoriesComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CategoriesComboBoxItemStateChanged
+        try {
+            if(CategoriesComboBox.getSelectedItem() != null) {
+                String category = CategoriesComboBox.getSelectedItem()
+                        .toString()
+                        .substring(0, 1)
+                        .toUpperCase()
+                        + CategoriesComboBox.getSelectedItem()
+                                .toString()
+                                .substring(1);
+                Statement st = database.getConn().createStatement();
+                ResultSet rs = st.executeQuery("SELECT product_name FROM product"
+                        + " WHERE category_name = '"+ category +"';");
+                ProductComboBox.removeAllItems();
+                while(rs.next()) {
+                    ProductComboBox.addItem(rs.getString(1));
+                }
+                ProductComboBox.setSelectedIndex(0);
+                st.close();
+                rs.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_CategoriesComboBoxItemStateChanged
 
-    }//GEN-LAST:event_formWindowClosing
+    private void AddProductToTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddProductToTableButtonActionPerformed
+        try {
+            Statement st = database.getConn().createStatement();
+            ResultSet rs = st.executeQuery("SELECT product_cost"
+                    + " FROM product WHERE product_name = '"+ 
+                    ProductComboBox.getSelectedItem().toString()
+                    .substring(0, 1)
+                    .toUpperCase() + ProductComboBox.getSelectedItem()
+                            .toString()
+                            .substring(1)
+                    +"';");
+            String productCost = "";
+            while(rs.next()) {
+                productCost = rs.getString(1);
+            }
+            DefaultTableModel model = (DefaultTableModel)NewOrderTable.getModel();
+            model.insertRow(0, new Object[] {
+                ProductComboBox.getSelectedItem().toString(),
+                productCost,
+                AmountSpinner.getValue().toString()
+            });
+            st.close();
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_AddProductToTableButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -221,10 +337,9 @@ public class App extends javax.swing.JFrame {
         }
         //</editor-fold>
 
-        LocalPSQLDatabase db = new LocalPSQLDatabase("dblabs.iee.ihu.gr", "5432",
+        database = new LocalPSQLDatabase("dblabs.iee.ihu.gr", "5432",
                 "it185287", "it185287", "AhoyScientist!0");
-        db.establishConnection();
-        db.getConn().close();
+        database.establishConnection();
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
@@ -237,20 +352,19 @@ public class App extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane ActiveOrdersScrollPane;
     private javax.swing.JTable ActiveOrdersTable;
-    private javax.swing.JToggleButton AddOrderButton;
-    private javax.swing.JToggleButton CancelOrderButton;
-    private javax.swing.JComboBox<String> CategoryComboBox;
-    private javax.swing.JLabel CategoryLabel;
+    private javax.swing.JButton AddProductToTableButton;
+    private javax.swing.JSpinner AmountSpinner;
+    private javax.swing.JButton CancelAddOrder;
+    private javax.swing.JComboBox<String> CategoriesComboBox;
     private javax.swing.JTabbedPane Dashboard;
     private javax.swing.JMenu NewMenu;
+    private javax.swing.JMenuItem NewOrderButton;
+    private javax.swing.JTable NewOrderTable;
     private javax.swing.JFrame NewOrderWindow;
-    private javax.swing.JMenuItem NewOriderButton;
+    private javax.swing.JButton ProceedOrderButton;
+    private javax.swing.JComboBox<String> ProductComboBox;
     private javax.swing.JMenuBar UtilityMenu;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }
