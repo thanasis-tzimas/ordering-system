@@ -243,7 +243,7 @@ public class App extends javax.swing.JFrame {
     }//GEN-LAST:event_NewOrderButtonActionPerformed
 
     private void ProceedOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedOrderButtonActionPerformed
-        
+
     }//GEN-LAST:event_ProceedOrderButtonActionPerformed
 
     private void CancelAddOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelAddOrderActionPerformed

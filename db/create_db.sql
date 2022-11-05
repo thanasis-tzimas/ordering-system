@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS categories;
-DROP TABLE IF EXISTS product_order;
-DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS product;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS categories CASCADE;
+DROP TABLE IF EXISTS product_order CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS product CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE categories (
         category_name VARCHAR(100) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE product (
         FOREIGN KEY(category_name) REFERENCES categories(category_name) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE product_order (
-        order_id SERIAL,
+        order_id INTEGER NOT NULL,
         product_id INTEGER NOT NULL,
         amount  INTEGER NOT NULL,
         PRIMARY KEY (order_id),
