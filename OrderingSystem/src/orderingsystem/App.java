@@ -4,9 +4,13 @@
  */
 package orderingsystem;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
@@ -23,6 +27,11 @@ public class App extends javax.swing.JFrame {
     public App() {
         // Render application
         initComponents();
+    }
+    
+    public String capitalizeFirst(String s) {
+        return (s.substring(0, 1).toUpperCase() 
+                + s.substring(1));
     }
 
     /**
@@ -165,6 +174,11 @@ public class App extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Ordering System I");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         ActiveOrdersTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -216,20 +230,15 @@ public class App extends javax.swing.JFrame {
         try {
             CategoriesComboBox.removeAllItems();
             Statement st = database.getConn().createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM categories;");
+            ResultSet rs = st.executeQuery("SELECT * FROM product_categories;");
             while(rs.next()) {
                 CategoriesComboBox.addItem(rs.getString(1));
             }
             CategoriesComboBox.setSelectedIndex(0);
             ProductComboBox.removeAllItems();
             // Capitalize first letter
-            String s = CategoriesComboBox.getSelectedItem()
-                    .toString()
-                    .substring(0, 1)
-                    .toUpperCase() + CategoriesComboBox.getSelectedItem()
-                            .toString()
-                            .substring(1);
-            rs = st.executeQuery("SELECT product_name FROM product"
+            String s = capitalizeFirst(CategoriesComboBox.getSelectedItem().toString());
+            rs = st.executeQuery("SELECT product_name FROM products"
                     + " WHERE category_name = '"+s+"';");
             while(rs.next()) {
                 ProductComboBox.addItem(rs.getString(1));
@@ -243,15 +252,60 @@ public class App extends javax.swing.JFrame {
     }//GEN-LAST:event_NewOrderButtonActionPerformed
 
     private void ProceedOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedOrderButtonActionPerformed
-
+        try {
+            Statement st = database.getConn().createStatement();
+            ResultSet rs = st.executeQuery("SELECT ORDER_ID FROM PRODUCT_ORDERS;");
+            // if next() returns false
+            // then start OrderID from 
+            // ID = 1, otherwise get the
+            // last ID from the database.
+            if(rs.next() != false) {
+                while(rs.next()) {
+                    OrderID = Integer.parseInt(rs.getString(1));
+                }
+                OrderID++;
+            }
+            ArrayList<ArrayList<String>> tableData = new ArrayList<>();
+            DefaultTableModel model = (DefaultTableModel)NewOrderTable.getModel();
+            for(int i = 0; i < model.getRowCount(); i++) {
+                ArrayList<String> tableRow = new ArrayList<>();
+                for(int j = 0; j < model.getColumnCount(); j++) {
+                    tableRow.add(model.getValueAt(i, j).toString());
+                }
+                tableData.add(tableRow);
+            }
+            for(int i = 0; i < model.getRowCount(); i++) {
+                String product_name = tableData.get(i).get(0);
+                String product_cost = tableData.get(i).get(1);
+                String amount = tableData.get(i).get(2);
+                rs = st.executeQuery("SELECT PRODUCT_ID FROM PRODUCTS "
+                        + "WHERE PRODUCT_NAME = '"+ product_name +"';");
+                String product_id = "1";
+                while(rs.next()) {
+                    product_id = rs.getString(1);
+                }
+                String insertSql = "INSERT INTO PRODUCT_ORDERS(ORDER_ID, PRODUCT_ID, PRODUCT_AMOUNT, ORDER_DOS) VALUES (?,?,?,?);";
+                PreparedStatement insertStatement = database.getConn().prepareStatement(insertSql);
+                insertStatement.setObject(1, OrderID);
+                insertStatement.setObject(2, Integer.parseInt(product_id));
+                insertStatement.setObject(3, Integer.parseInt(amount));
+                insertStatement.setObject(4, Date.valueOf("2022-11-08"));
+                insertStatement.executeUpdate();
+            }
+            OrderID++;
+            rs.close();
+            st.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        DefaultTableModel model = (DefaultTableModel)NewOrderTable.getModel();
+        model.setRowCount(0);
+        NewOrderWindow.dispose();
     }//GEN-LAST:event_ProceedOrderButtonActionPerformed
 
     private void CancelAddOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelAddOrderActionPerformed
-        try {
-            database.closeConnection();
-        } catch (SQLException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        DefaultTableModel model = (DefaultTableModel)NewOrderTable.getModel();
+        model.setRowCount(0);
         NewOrderWindow.dispose();
     }//GEN-LAST:event_CancelAddOrderActionPerformed
 
@@ -266,7 +320,7 @@ public class App extends javax.swing.JFrame {
                                 .toString()
                                 .substring(1);
                 Statement st = database.getConn().createStatement();
-                ResultSet rs = st.executeQuery("SELECT product_name FROM product"
+                ResultSet rs = st.executeQuery("SELECT product_name FROM products"
                         + " WHERE category_name = '"+ category +"';");
                 ProductComboBox.removeAllItems();
                 while(rs.next()) {
@@ -285,7 +339,7 @@ public class App extends javax.swing.JFrame {
         try {
             Statement st = database.getConn().createStatement();
             ResultSet rs = st.executeQuery("SELECT product_cost"
-                    + " FROM product WHERE product_name = '"+ 
+                    + " FROM products WHERE product_name = '"+ 
                     ProductComboBox.getSelectedItem().toString()
                     .substring(0, 1)
                     .toUpperCase() + ProductComboBox.getSelectedItem()
@@ -308,6 +362,14 @@ public class App extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }//GEN-LAST:event_AddProductToTableButtonActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        try {
+            database.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
@@ -348,7 +410,8 @@ public class App extends javax.swing.JFrame {
     }
     
     static LocalPSQLDatabase database;
-
+    static int OrderID = 1;
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane ActiveOrdersScrollPane;
     private javax.swing.JTable ActiveOrdersTable;
