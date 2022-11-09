@@ -53,6 +53,9 @@ public class App extends javax.swing.JFrame {
         CategoriesComboBox = new javax.swing.JComboBox<>();
         ProductComboBox = new javax.swing.JComboBox<>();
         AmountSpinner = new javax.swing.JSpinner();
+        WarningNothingAddedToOrder = new javax.swing.JDialog();
+        jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
         Dashboard = new javax.swing.JTabbedPane();
         ActiveOrdersScrollPane = new javax.swing.JScrollPane();
         ActiveOrdersTable = new javax.swing.JTable();
@@ -172,6 +175,39 @@ public class App extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        jButton1.setText("Dismiss");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Warning: You have not added anything to the order!");
+
+        javax.swing.GroupLayout WarningNothingAddedToOrderLayout = new javax.swing.GroupLayout(WarningNothingAddedToOrder.getContentPane());
+        WarningNothingAddedToOrder.getContentPane().setLayout(WarningNothingAddedToOrderLayout);
+        WarningNothingAddedToOrderLayout.setHorizontalGroup(
+            WarningNothingAddedToOrderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(WarningNothingAddedToOrderLayout.createSequentialGroup()
+                .addGroup(WarningNothingAddedToOrderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(WarningNothingAddedToOrderLayout.createSequentialGroup()
+                        .addGap(157, 157, 157)
+                        .addComponent(jButton1))
+                    .addGroup(WarningNothingAddedToOrderLayout.createSequentialGroup()
+                        .addGap(33, 33, 33)
+                        .addComponent(jLabel1)))
+                .addContainerGap(23, Short.MAX_VALUE))
+        );
+        WarningNothingAddedToOrderLayout.setVerticalGroup(
+            WarningNothingAddedToOrderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, WarningNothingAddedToOrderLayout.createSequentialGroup()
+                .addContainerGap(36, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addGap(39, 39, 39))
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Ordering System I");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -182,13 +218,10 @@ public class App extends javax.swing.JFrame {
 
         ActiveOrdersTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "OrderID", "Date", "Total", "Cashier"
             }
         ));
         ActiveOrdersScrollPane.setViewportView(ActiveOrdersTable);
@@ -252,53 +285,79 @@ public class App extends javax.swing.JFrame {
     }//GEN-LAST:event_NewOrderButtonActionPerformed
 
     private void ProceedOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProceedOrderButtonActionPerformed
-        try {
-            Statement st = database.getConn().createStatement();
-            ResultSet rs = st.executeQuery("SELECT ORDER_ID FROM PRODUCT_ORDERS;");
-            // if next() returns false
-            // then start OrderID from 
-            // ID = 1, otherwise get the
-            // last ID from the database.
-            if(rs.next() != false) {
-                while(rs.next()) {
-                    OrderID = Integer.parseInt(rs.getString(1));
-                }
-                OrderID++;
-            }
-            ArrayList<ArrayList<String>> tableData = new ArrayList<>();
-            DefaultTableModel model = (DefaultTableModel)NewOrderTable.getModel();
-            for(int i = 0; i < model.getRowCount(); i++) {
-                ArrayList<String> tableRow = new ArrayList<>();
-                for(int j = 0; j < model.getColumnCount(); j++) {
-                    tableRow.add(model.getValueAt(i, j).toString());
-                }
-                tableData.add(tableRow);
-            }
-            for(int i = 0; i < model.getRowCount(); i++) {
-                String product_name = tableData.get(i).get(0);
-                String product_cost = tableData.get(i).get(1);
-                String amount = tableData.get(i).get(2);
-                rs = st.executeQuery("SELECT PRODUCT_ID FROM PRODUCTS "
-                        + "WHERE PRODUCT_NAME = '"+ product_name +"';");
-                String product_id = "1";
-                while(rs.next()) {
-                    product_id = rs.getString(1);
-                }
-                String insertSql = "INSERT INTO PRODUCT_ORDERS(ORDER_ID, PRODUCT_ID, PRODUCT_AMOUNT, ORDER_DOS) VALUES (?,?,?,?);";
-                PreparedStatement insertStatement = database.getConn().prepareStatement(insertSql);
-                insertStatement.setObject(1, OrderID);
-                insertStatement.setObject(2, Integer.parseInt(product_id));
-                insertStatement.setObject(3, Integer.parseInt(amount));
-                insertStatement.setObject(4, Date.valueOf("2022-11-08"));
-                insertStatement.executeUpdate();
-            }
-            OrderID++;
-            rs.close();
-            st.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
         DefaultTableModel model = (DefaultTableModel)NewOrderTable.getModel();
+        if(model.getRowCount() == 0) {
+            WarningNothingAddedToOrder.pack();
+            WarningNothingAddedToOrder.setVisible(true);
+        } else {
+            try {
+                Statement st = database.getConn().createStatement();
+                ResultSet rs = st.executeQuery("SELECT ORDER_ID FROM PRODUCT_ORDERS;");
+                // if next() returns false
+                // then start OrderID from 
+                // ID = 1, otherwise get the
+                // last ID from the database.
+                if(rs.next() != false) {
+                    while(rs.next()) {
+                        OrderID = Integer.parseInt(rs.getString(1));
+                    }
+                    OrderID++;
+                }
+                ArrayList<ArrayList<String>> tableData = new ArrayList<>();
+                for(int i = 0; i < model.getRowCount(); i++) {
+                    ArrayList<String> tableRow = new ArrayList<>();
+                    for(int j = 0; j < model.getColumnCount(); j++) {
+                        tableRow.add(model.getValueAt(i, j).toString());
+                    }
+                    tableData.add(tableRow);
+                }
+                double itemsTotalCost = 0;
+                for(int i = 0; i < model.getRowCount(); i++) {
+                    String product_name = tableData.get(i).get(0);
+                    String product_cost = tableData.get(i).get(1);
+                    String amount = tableData.get(i).get(2);
+                    itemsTotalCost += Float.parseFloat(product_cost) * Integer.parseInt(amount);
+                    rs = st.executeQuery("SELECT PRODUCT_ID FROM PRODUCTS "
+                            + "WHERE PRODUCT_NAME = '"+ product_name +"';");
+                    String product_id = "1";
+                    while(rs.next()) {
+                        product_id = rs.getString(1);
+                    }
+                    String insertSql = "INSERT INTO PRODUCT_ORDERS(ORDER_ID, PRODUCT_ID, PRODUCT_AMOUNT, ORDER_DOS) VALUES (?,?,?,?);";
+                    PreparedStatement insertStatement = database.getConn().prepareStatement(insertSql);
+                    insertStatement.setObject(1, OrderID);
+                    insertStatement.setObject(2, Integer.parseInt(product_id));
+                    insertStatement.setObject(3, Integer.parseInt(amount));
+                    insertStatement.setObject(4, Date.valueOf("2022-11-08"));
+                    insertStatement.executeUpdate();
+                }
+                // After all that
+                // create a new receipt
+                // and mark it as 'active'.
+                String insertNewReceiptSQL = "INSERT INTO RECEIPTS(RECEIPT_ID, RECEIPT_DOS, RECEIPT_TOTAL, RECEIPT_STATE, CASHIER_ID) VALUES (?,?,?,?::RECEIPT_STATE,?);";
+                PreparedStatement insertNewReceiptStatement = database.getConn().prepareStatement(insertNewReceiptSQL);
+                insertNewReceiptStatement.setObject(1, OrderID);
+                insertNewReceiptStatement.setObject(2, Date.valueOf("2022-11-08"));
+                insertNewReceiptStatement.setObject(3, itemsTotalCost);
+                insertNewReceiptStatement.setObject(4, "ACTIVE");
+                insertNewReceiptStatement.setObject(5, 1);
+                insertNewReceiptStatement.execute();
+                
+                DefaultTableModel dashboardActiveModel = (DefaultTableModel)ActiveOrdersTable.getModel();
+                dashboardActiveModel.addRow( new Object[] {
+                    OrderID,
+                    Date.valueOf("2022-11-08"),
+                    itemsTotalCost,
+                    "Thanasis"
+                });
+                
+                OrderID++;
+                rs.close();
+                st.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
         model.setRowCount(0);
         NewOrderWindow.dispose();
     }//GEN-LAST:event_ProceedOrderButtonActionPerformed
@@ -371,6 +430,10 @@ public class App extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formWindowClosing
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        WarningNothingAddedToOrder.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -427,6 +490,9 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JButton ProceedOrderButton;
     private javax.swing.JComboBox<String> ProductComboBox;
     private javax.swing.JMenuBar UtilityMenu;
+    private javax.swing.JDialog WarningNothingAddedToOrder;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
