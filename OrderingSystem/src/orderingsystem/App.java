@@ -498,6 +498,7 @@ public class App extends javax.swing.JFrame {
         int rowIdx = ActiveOrdersTable.getSelectedRow();
         int orderId = (int)ActiveOrdersTable.getValueAt(rowIdx, 0);
         try {
+            DefaultTableModel model = (DefaultTableModel)NewOrderTable1.getModel();
             Statement st = database.getConn().createStatement();
             ResultSet rs = st.executeQuery("SELECT product_name, product_cost, product_amount\n" +
                 "FROM product_orders\n" +
@@ -507,7 +508,11 @@ public class App extends javax.swing.JFrame {
                 String productName = rs.getString(1);
                 String productAmount = rs.getString(2);
                 String productCost = rs.getString(3);
-                System.out.println(productName + productCost + productAmount);
+                model.insertRow(0, new Object[] {
+                    productName,
+                    productCost,
+                    productAmount
+                });
             }
             
         } catch (SQLException e) {
