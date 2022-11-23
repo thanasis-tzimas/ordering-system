@@ -53,12 +53,17 @@ public class App extends javax.swing.JFrame {
         WarningNothingAddedToOrder = new javax.swing.JDialog();
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        EditOrdersWindow = new javax.swing.JFrame();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        NewOrderTable1 = new javax.swing.JTable();
         Dashboard = new javax.swing.JTabbedPane();
         ActiveOrdersScrollPane = new javax.swing.JScrollPane();
         ActiveOrdersTable = new javax.swing.JTable();
         UtilityMenu = new javax.swing.JMenuBar();
         NewMenu = new javax.swing.JMenu();
         NewOrderButton = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
 
         NewOrderWindow.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         NewOrderWindow.setTitle("Add a new order");
@@ -205,6 +210,41 @@ public class App extends javax.swing.JFrame {
                 .addGap(39, 39, 39))
         );
 
+        NewOrderTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Product Name", "Cost", "Amount"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, true, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane4.setViewportView(NewOrderTable1);
+
+        javax.swing.GroupLayout EditOrdersWindowLayout = new javax.swing.GroupLayout(EditOrdersWindow.getContentPane());
+        EditOrdersWindow.getContentPane().setLayout(EditOrdersWindowLayout);
+        EditOrdersWindowLayout.setHorizontalGroup(
+            EditOrdersWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, EditOrdersWindowLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        EditOrdersWindowLayout.setVerticalGroup(
+            EditOrdersWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(EditOrdersWindowLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Ordering System I");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -221,6 +261,11 @@ public class App extends javax.swing.JFrame {
                 "OrderID", "Date", "Total", "Cashier"
             }
         ));
+        ActiveOrdersTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ActiveOrdersTableMouseClicked(evt);
+            }
+        });
         ActiveOrdersScrollPane.setViewportView(ActiveOrdersTable);
 
         Dashboard.addTab("Active Orders", ActiveOrdersScrollPane);
@@ -236,6 +281,18 @@ public class App extends javax.swing.JFrame {
         NewMenu.add(NewOrderButton);
 
         UtilityMenu.add(NewMenu);
+
+        jMenu1.setText("Edit");
+
+        jMenuItem1.setText("Edit Orders");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        UtilityMenu.add(jMenu1);
 
         setJMenuBar(UtilityMenu);
 
@@ -431,6 +488,33 @@ public class App extends javax.swing.JFrame {
         WarningNothingAddedToOrder.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void ActiveOrdersTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ActiveOrdersTableMouseClicked
+        EditOrdersWindow.pack();
+        EditOrdersWindow.setVisible(true);
+        int rowIdx = ActiveOrdersTable.getSelectedRow();
+        int orderId = (int)ActiveOrdersTable.getValueAt(rowIdx, 0);
+        try {
+            Statement st = database.getConn().createStatement();
+            ResultSet rs = st.executeQuery("SELECT product_name, product_cost, product_amount\n" +
+                "FROM product_orders\n" +
+                "INNER JOIN products ON products.product_id = product_orders.product_id\n" +
+                "WHERE order_id = "+orderId+";");
+            while(rs.next()) {
+                String productName = rs.getString(1);
+                String productAmount = rs.getString(2);
+                String productCost = rs.getString(3);
+                System.out.println(productName + productCost + productAmount);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_ActiveOrdersTableMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -480,9 +564,11 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JButton CancelAddOrder;
     private javax.swing.JComboBox<String> CategoriesComboBox;
     private javax.swing.JTabbedPane Dashboard;
+    private javax.swing.JFrame EditOrdersWindow;
     private javax.swing.JMenu NewMenu;
     private javax.swing.JMenuItem NewOrderButton;
     private javax.swing.JTable NewOrderTable;
+    private javax.swing.JTable NewOrderTable1;
     private javax.swing.JFrame NewOrderWindow;
     private javax.swing.JButton ProceedOrderButton;
     private javax.swing.JComboBox<String> ProductComboBox;
@@ -490,7 +576,10 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JDialog WarningNothingAddedToOrder;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane4;
     // End of variables declaration//GEN-END:variables
 }
