@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -51,11 +52,14 @@ public class App extends javax.swing.JFrame {
         ProductComboBox = new javax.swing.JComboBox<>();
         AmountSpinner = new javax.swing.JSpinner();
         WarningNothingAddedToOrder = new javax.swing.JDialog();
-        jButton1 = new javax.swing.JButton();
+        DismissWarningNothingAdded = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         EditOrdersWindow = new javax.swing.JFrame();
         jScrollPane4 = new javax.swing.JScrollPane();
         NewOrderTable1 = new javax.swing.JTable();
+        OrderDeleteSuccess = new javax.swing.JDialog();
+        DismissOrderDeleteSuccess = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         Dashboard = new javax.swing.JTabbedPane();
         ActiveOrdersScrollPane = new javax.swing.JScrollPane();
         ActiveOrdersTable = new javax.swing.JTable();
@@ -63,7 +67,8 @@ public class App extends javax.swing.JFrame {
         NewMenu = new javax.swing.JMenu();
         NewOrderButton = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        EditOrderMenuButton = new javax.swing.JMenuItem();
+        DeleteOrderMenuButton = new javax.swing.JMenuItem();
 
         NewOrderWindow.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         NewOrderWindow.setTitle("Add a new order");
@@ -177,10 +182,10 @@ public class App extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        jButton1.setText("Dismiss");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        DismissWarningNothingAdded.setText("Dismiss");
+        DismissWarningNothingAdded.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                DismissWarningNothingAddedActionPerformed(evt);
             }
         });
 
@@ -193,12 +198,12 @@ public class App extends javax.swing.JFrame {
             .addGroup(WarningNothingAddedToOrderLayout.createSequentialGroup()
                 .addGroup(WarningNothingAddedToOrderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(WarningNothingAddedToOrderLayout.createSequentialGroup()
-                        .addGap(157, 157, 157)
-                        .addComponent(jButton1))
+                        .addGap(127, 127, 127)
+                        .addComponent(DismissWarningNothingAdded))
                     .addGroup(WarningNothingAddedToOrderLayout.createSequentialGroup()
-                        .addGap(33, 33, 33)
+                        .addGap(28, 28, 28)
                         .addComponent(jLabel1)))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
         WarningNothingAddedToOrderLayout.setVerticalGroup(
             WarningNothingAddedToOrderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -206,7 +211,7 @@ public class App extends javax.swing.JFrame {
                 .addContainerGap(36, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addComponent(DismissWarningNothingAdded)
                 .addGap(39, 39, 39))
         );
 
@@ -245,6 +250,39 @@ public class App extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        DismissOrderDeleteSuccess.setText("Dismiss");
+        DismissOrderDeleteSuccess.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DismissOrderDeleteSuccessActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setText("You have successfully deleted an order!");
+
+        javax.swing.GroupLayout OrderDeleteSuccessLayout = new javax.swing.GroupLayout(OrderDeleteSuccess.getContentPane());
+        OrderDeleteSuccess.getContentPane().setLayout(OrderDeleteSuccessLayout);
+        OrderDeleteSuccessLayout.setHorizontalGroup(
+            OrderDeleteSuccessLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(OrderDeleteSuccessLayout.createSequentialGroup()
+                .addGroup(OrderDeleteSuccessLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(OrderDeleteSuccessLayout.createSequentialGroup()
+                        .addGap(127, 127, 127)
+                        .addComponent(DismissOrderDeleteSuccess))
+                    .addGroup(OrderDeleteSuccessLayout.createSequentialGroup()
+                        .addGap(61, 61, 61)
+                        .addComponent(jLabel2)))
+                .addContainerGap(63, Short.MAX_VALUE))
+        );
+        OrderDeleteSuccessLayout.setVerticalGroup(
+            OrderDeleteSuccessLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, OrderDeleteSuccessLayout.createSequentialGroup()
+                .addContainerGap(36, Short.MAX_VALUE)
+                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
+                .addComponent(DismissOrderDeleteSuccess)
+                .addGap(39, 39, 39))
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Ordering System I");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -261,11 +299,6 @@ public class App extends javax.swing.JFrame {
                 "OrderID", "Date", "Total", "Cashier"
             }
         ));
-        ActiveOrdersTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                ActiveOrdersTableMouseClicked(evt);
-            }
-        });
         ActiveOrdersScrollPane.setViewportView(ActiveOrdersTable);
 
         Dashboard.addTab("Active Orders", ActiveOrdersScrollPane);
@@ -284,13 +317,21 @@ public class App extends javax.swing.JFrame {
 
         jMenu1.setText("Edit");
 
-        jMenuItem1.setText("Edit Orders");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        EditOrderMenuButton.setText("Edit Order");
+        EditOrderMenuButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                EditOrderMenuButtonActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem1);
+        jMenu1.add(EditOrderMenuButton);
+
+        DeleteOrderMenuButton.setText("Delete Order");
+        DeleteOrderMenuButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DeleteOrderMenuButtonActionPerformed(evt);
+            }
+        });
+        jMenu1.add(DeleteOrderMenuButton);
 
         UtilityMenu.add(jMenu1);
 
@@ -316,8 +357,9 @@ public class App extends javax.swing.JFrame {
         // Get categories
         try {
             CategoriesComboBox.removeAllItems();
-            Statement st = database.getConn().createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM product_categories;");
+            String sqlQuery = "SELECT getCategories();";
+            PreparedStatement sqlStatement = database.getConn().prepareStatement(sqlQuery);
+            ResultSet rs = sqlStatement.executeQuery();
             while(rs.next()) {
                 CategoriesComboBox.addItem(rs.getString(1));
             }
@@ -325,14 +367,15 @@ public class App extends javax.swing.JFrame {
             ProductComboBox.removeAllItems();
             // Capitalize first letter
             String s = capitalizeFirst(CategoriesComboBox.getSelectedItem().toString());
-            rs = st.executeQuery("SELECT product_name FROM products"
-                    + " WHERE category_name = '"+s+"';");
+            sqlQuery = "SELECT getProductsFromCategory(?);";
+            sqlStatement = database.getConn().prepareStatement(sqlQuery);
+            sqlStatement.setObject(1, s);
+            rs = sqlStatement.executeQuery();
             while(rs.next()) {
                 ProductComboBox.addItem(rs.getString(1));
             }
             ProductComboBox.setSelectedIndex(0);
             rs.close();
-            st.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -345,8 +388,9 @@ public class App extends javax.swing.JFrame {
             WarningNothingAddedToOrder.setVisible(true);
         } else {
             try {
-                Statement st = database.getConn().createStatement();
-                ResultSet rs = st.executeQuery("SELECT ORDER_ID FROM PRODUCT_ORDERS;");
+                String sqlQuery = "SELECT getOrderID();";
+                PreparedStatement sqlStatement = database.getConn().prepareStatement(sqlQuery);
+                ResultSet rs = sqlStatement.executeQuery();
                 // if next() returns false
                 // then start OrderID from 
                 // ID = 1, otherwise get the
@@ -371,24 +415,26 @@ public class App extends javax.swing.JFrame {
                     String product_cost = tableData.get(i).get(1);
                     String amount = tableData.get(i).get(2);
                     itemsTotalCost += Float.parseFloat(product_cost) * Integer.parseInt(amount);
-                    rs = st.executeQuery("SELECT PRODUCT_ID FROM PRODUCTS "
-                            + "WHERE PRODUCT_NAME = '"+ product_name +"';");
+                    sqlQuery = "SELECT getProductIDFromName(?);";
+                    sqlStatement = database.getConn().prepareStatement(sqlQuery);
+                    sqlStatement.setObject(1, product_name);
+                    rs = sqlStatement.executeQuery();
                     String product_id = "1";
                     while(rs.next()) {
                         product_id = rs.getString(1);
                     }
-                    String insertSql = "INSERT INTO PRODUCT_ORDERS(ORDER_ID, PRODUCT_ID, PRODUCT_AMOUNT, ORDER_DOS) VALUES (?,?,?,?);";
+                    String insertSql = "SELECT createNewProductOrder(?,?,?,?);";
                     PreparedStatement insertStatement = database.getConn().prepareStatement(insertSql);
                     insertStatement.setObject(1, OrderID);
                     insertStatement.setObject(2, Integer.parseInt(product_id));
                     insertStatement.setObject(3, Integer.parseInt(amount));
                     insertStatement.setObject(4, Date.valueOf("2022-11-08"));
-                    insertStatement.executeUpdate();
+                    insertStatement.execute();
                 }
                 // After all that
                 // create a new receipt
                 // and mark it as 'active'.
-                String insertNewReceiptSQL = "INSERT INTO RECEIPTS(RECEIPT_ID, RECEIPT_DOS, RECEIPT_TOTAL, RECEIPT_STATE, CASHIER_ID) VALUES (?,?,?,?::RECEIPT_STATE,?);";
+                String insertNewReceiptSQL = "SELECT createNewReceipt(?,?::DATE,?::NUMERIC,?::RECEIPT_STATE,?);";
                 PreparedStatement insertNewReceiptStatement = database.getConn().prepareStatement(insertNewReceiptSQL);
                 insertNewReceiptStatement.setObject(1, OrderID);
                 insertNewReceiptStatement.setObject(2, Date.valueOf("2022-11-08"));
@@ -407,7 +453,6 @@ public class App extends javax.swing.JFrame {
                 
                 OrderID++;
                 rs.close();
-                st.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -425,22 +470,16 @@ public class App extends javax.swing.JFrame {
     private void CategoriesComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CategoriesComboBoxItemStateChanged
         try {
             if(CategoriesComboBox.getSelectedItem() != null) {
-                String category = CategoriesComboBox.getSelectedItem()
-                        .toString()
-                        .substring(0, 1)
-                        .toUpperCase()
-                        + CategoriesComboBox.getSelectedItem()
-                                .toString()
-                                .substring(1);
-                Statement st = database.getConn().createStatement();
-                ResultSet rs = st.executeQuery("SELECT product_name FROM products"
-                        + " WHERE category_name = '"+ category +"';");
+                String category = capitalizeFirst(CategoriesComboBox.getSelectedItem().toString());
+                String sqlQuery = "SELECT getProductsFromCategory(?);";
+                PreparedStatement sqlStatement = database.getConn().prepareStatement(sqlQuery);
+                sqlStatement.setObject(1, category);
+                ResultSet rs = sqlStatement.executeQuery();
                 ProductComboBox.removeAllItems();
                 while(rs.next()) {
                     ProductComboBox.addItem(rs.getString(1));
                 }
                 ProductComboBox.setSelectedIndex(0);
-                st.close();
                 rs.close();
             }
         } catch (SQLException e) {
@@ -450,15 +489,11 @@ public class App extends javax.swing.JFrame {
 
     private void AddProductToTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddProductToTableButtonActionPerformed
         try {
-            Statement st = database.getConn().createStatement();
-            ResultSet rs = st.executeQuery("SELECT product_cost"
-                    + " FROM products WHERE product_name = '"+ 
-                    ProductComboBox.getSelectedItem().toString()
-                    .substring(0, 1)
-                    .toUpperCase() + ProductComboBox.getSelectedItem()
-                            .toString()
-                            .substring(1)
-                    +"';");
+            String productName = capitalizeFirst(ProductComboBox.getSelectedItem().toString());
+            String sqlQuery = "SELECT getProductCostFromName(?);";
+            PreparedStatement sqlStatement = database.getConn().prepareStatement(sqlQuery);
+            sqlStatement.setObject(1, productName);
+            ResultSet rs = sqlStatement.executeQuery();
             String productCost = "";
             while(rs.next()) {
                 productCost = rs.getString(1);
@@ -469,7 +504,6 @@ public class App extends javax.swing.JFrame {
                 productCost,
                 AmountSpinner.getValue().toString()
             });
-            st.close();
             rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -484,41 +518,66 @@ public class App extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formWindowClosing
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void DismissWarningNothingAddedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DismissWarningNothingAddedActionPerformed
         WarningNothingAddedToOrder.dispose();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_DismissWarningNothingAddedActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    private void EditOrderMenuButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditOrderMenuButtonActionPerformed
+        //        EditOrdersWindow.pack();
+//        EditOrdersWindow.setVisible(true);
+//        int rowIdx = ActiveOrdersTable.getSelectedRow();
+//        int orderId = (int)ActiveOrdersTable.getValueAt(rowIdx, 0);
+//        try {
+//            DefaultTableModel model = (DefaultTableModel)NewOrderTable1.getModel();
+//            String sqlQuery = "SELECT getProductOrdersFromOrderID(?);";
+//            PreparedStatement sqlStatement = database.getConn().prepareStatement(sqlQuery);
+//            sqlStatement.setObject(1, orderId);
+//            ResultSet rs = sqlStatement.executeQuery();
+//            while(rs.next()) {
+//                String productName = rs.getString(1);
+//                String productAmount = rs.getString(2);
+//                String productCost = rs.getString(3);
+//                model.insertRow(0, new Object[] {
+//                    productName,
+//                    productCost,
+//                    productAmount
+//                });
+//            }
+//            
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+    }//GEN-LAST:event_EditOrderMenuButtonActionPerformed
 
-    private void ActiveOrdersTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ActiveOrdersTableMouseClicked
-        EditOrdersWindow.pack();
-        EditOrdersWindow.setVisible(true);
+    private void DeleteOrderMenuButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteOrderMenuButtonActionPerformed
         int rowIdx = ActiveOrdersTable.getSelectedRow();
-        int orderId = (int)ActiveOrdersTable.getValueAt(rowIdx, 0);
+        if(rowIdx == -1) {
+            // TODO
+            JOptionPane.showMessageDialog(null, "You haven't selected anything to delete!");
+            return;
+        }
+        int receiptID = (int)ActiveOrdersTable.getValueAt(rowIdx, 0);
         try {
-            DefaultTableModel model = (DefaultTableModel)NewOrderTable1.getModel();
-            Statement st = database.getConn().createStatement();
-            ResultSet rs = st.executeQuery("SELECT product_name, product_cost, product_amount\n" +
-                "FROM product_orders\n" +
-                "INNER JOIN products ON products.product_id = product_orders.product_id\n" +
-                "WHERE order_id = "+orderId+";");
-            while(rs.next()) {
-                String productName = rs.getString(1);
-                String productAmount = rs.getString(2);
-                String productCost = rs.getString(3);
-                model.insertRow(0, new Object[] {
-                    productName,
-                    productCost,
-                    productAmount
-                });
-            }
+            String sqlQuery = "SELECT deleteReceiptFromReceiptID(?);";
+            PreparedStatement sqlStatement = database.getConn().prepareStatement(sqlQuery);
+            sqlStatement.setObject(1, receiptID);
+            sqlStatement.execute();
             
+            sqlQuery = "SELECT deleteOrdersFromOrderID(?);";
+            sqlStatement = database.getConn().prepareStatement(sqlQuery);
+            sqlStatement.setObject(1, receiptID);
+            sqlStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }//GEN-LAST:event_ActiveOrdersTableMouseClicked
+        DefaultTableModel model = (DefaultTableModel)ActiveOrdersTable.getModel();
+        model.removeRow(rowIdx);
+        JOptionPane.showMessageDialog(null, "You successfully deleted an order!");
+    }//GEN-LAST:event_DeleteOrderMenuButtonActionPerformed
+
+    private void DismissOrderDeleteSuccessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DismissOrderDeleteSuccessActionPerformed
+        OrderDeleteSuccess.dispose();
+    }//GEN-LAST:event_DismissOrderDeleteSuccessActionPerformed
 
     /**
      * @param args the command line arguments
@@ -569,20 +628,24 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JButton CancelAddOrder;
     private javax.swing.JComboBox<String> CategoriesComboBox;
     private javax.swing.JTabbedPane Dashboard;
+    private javax.swing.JMenuItem DeleteOrderMenuButton;
+    private javax.swing.JButton DismissOrderDeleteSuccess;
+    private javax.swing.JButton DismissWarningNothingAdded;
+    private javax.swing.JMenuItem EditOrderMenuButton;
     private javax.swing.JFrame EditOrdersWindow;
     private javax.swing.JMenu NewMenu;
     private javax.swing.JMenuItem NewOrderButton;
     private javax.swing.JTable NewOrderTable;
     private javax.swing.JTable NewOrderTable1;
     private javax.swing.JFrame NewOrderWindow;
+    private javax.swing.JDialog OrderDeleteSuccess;
     private javax.swing.JButton ProceedOrderButton;
     private javax.swing.JComboBox<String> ProductComboBox;
     private javax.swing.JMenuBar UtilityMenu;
     private javax.swing.JDialog WarningNothingAddedToOrder;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
