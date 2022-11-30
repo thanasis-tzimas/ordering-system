@@ -523,30 +523,30 @@ public class App extends javax.swing.JFrame {
     }//GEN-LAST:event_DismissWarningNothingAddedActionPerformed
 
     private void EditOrderMenuButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditOrderMenuButtonActionPerformed
-        //        EditOrdersWindow.pack();
-//        EditOrdersWindow.setVisible(true);
-//        int rowIdx = ActiveOrdersTable.getSelectedRow();
-//        int orderId = (int)ActiveOrdersTable.getValueAt(rowIdx, 0);
-//        try {
-//            DefaultTableModel model = (DefaultTableModel)NewOrderTable1.getModel();
-//            String sqlQuery = "SELECT getProductOrdersFromOrderID(?);";
-//            PreparedStatement sqlStatement = database.getConn().prepareStatement(sqlQuery);
-//            sqlStatement.setObject(1, orderId);
-//            ResultSet rs = sqlStatement.executeQuery();
-//            while(rs.next()) {
-//                String productName = rs.getString(1);
-//                String productAmount = rs.getString(2);
-//                String productCost = rs.getString(3);
-//                model.insertRow(0, new Object[] {
-//                    productName,
-//                    productCost,
-//                    productAmount
-//                });
-//            }
-//            
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+        EditOrdersWindow.pack();
+        EditOrdersWindow.setVisible(true);
+        int rowIdx = ActiveOrdersTable.getSelectedRow();
+        int orderId = (int)ActiveOrdersTable.getValueAt(rowIdx, 0);
+        try {
+            DefaultTableModel model = (DefaultTableModel)NewOrderTable1.getModel();
+            String sqlQuery = "SELECT * FROM getProductOrdersFromOrderID(?);";
+            PreparedStatement sqlStatement = database.getConn().prepareStatement(sqlQuery);
+            sqlStatement.setObject(1, orderId);
+            ResultSet rs = sqlStatement.executeQuery();
+            while(rs.next()) {
+                String productName = rs.getString(1);
+                String productAmount = rs.getString(2);
+                String productCost = rs.getString(3);
+                model.insertRow(0, new Object[] {
+                    productName,
+                    productCost,
+                    productAmount
+                });
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_EditOrderMenuButtonActionPerformed
 
     private void DeleteOrderMenuButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteOrderMenuButtonActionPerformed
