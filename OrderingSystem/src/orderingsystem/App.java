@@ -4,6 +4,7 @@
  */
 package orderingsystem;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -56,7 +57,8 @@ public class App extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         EditOrdersWindow = new javax.swing.JFrame();
         jScrollPane4 = new javax.swing.JScrollPane();
-        NewOrderTable1 = new javax.swing.JTable();
+        EditOrderTable = new javax.swing.JTable();
+        DoneEditOrderButton = new javax.swing.JButton();
         OrderDeleteSuccess = new javax.swing.JDialog();
         DismissOrderDeleteSuccess = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
@@ -215,23 +217,37 @@ public class App extends javax.swing.JFrame {
                 .addGap(39, 39, 39))
         );
 
-        NewOrderTable1.setModel(new javax.swing.table.DefaultTableModel(
+        EditOrdersWindow.setTitle("Edit Order");
+        EditOrdersWindow.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                EditOrdersWindowWindowClosing(evt);
+            }
+        });
+
+        EditOrderTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Product Name", "Cost", "Amount"
+                "Product Name", "Amount", "Cost"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, true, false
+                false, true, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane4.setViewportView(NewOrderTable1);
+        jScrollPane4.setViewportView(EditOrderTable);
+
+        DoneEditOrderButton.setText("Done");
+        DoneEditOrderButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DoneEditOrderButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout EditOrdersWindowLayout = new javax.swing.GroupLayout(EditOrdersWindow.getContentPane());
         EditOrdersWindow.getContentPane().setLayout(EditOrdersWindowLayout);
@@ -241,13 +257,19 @@ public class App extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(EditOrdersWindowLayout.createSequentialGroup()
+                .addGap(232, 232, 232)
+                .addComponent(DoneEditOrderButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         EditOrdersWindowLayout.setVerticalGroup(
             EditOrdersWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(EditOrdersWindowLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(DoneEditOrderButton)
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         DismissOrderDeleteSuccess.setText("Dismiss");
@@ -528,7 +550,7 @@ public class App extends javax.swing.JFrame {
         int rowIdx = ActiveOrdersTable.getSelectedRow();
         int orderId = (int)ActiveOrdersTable.getValueAt(rowIdx, 0);
         try {
-            DefaultTableModel model = (DefaultTableModel)NewOrderTable1.getModel();
+            DefaultTableModel model = (DefaultTableModel)EditOrderTable.getModel();
             String sqlQuery = "SELECT * FROM getProductOrdersFromOrderID(?);";
             PreparedStatement sqlStatement = database.getConn().prepareStatement(sqlQuery);
             sqlStatement.setObject(1, orderId);
@@ -556,16 +578,16 @@ public class App extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "You haven't selected anything to delete!");
             return;
         }
-        int receiptID = (int)ActiveOrdersTable.getValueAt(rowIdx, 0);
+        ReceiptID = (int)ActiveOrdersTable.getValueAt(rowIdx, 0);
         try {
             String sqlQuery = "SELECT deleteReceiptFromReceiptID(?);";
             PreparedStatement sqlStatement = database.getConn().prepareStatement(sqlQuery);
-            sqlStatement.setObject(1, receiptID);
+            sqlStatement.setObject(1, ReceiptID);
             sqlStatement.execute();
             
             sqlQuery = "SELECT deleteOrdersFromOrderID(?);";
             sqlStatement = database.getConn().prepareStatement(sqlQuery);
-            sqlStatement.setObject(1, receiptID);
+            sqlStatement.setObject(1, ReceiptID);
             sqlStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -578,6 +600,42 @@ public class App extends javax.swing.JFrame {
     private void DismissOrderDeleteSuccessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DismissOrderDeleteSuccessActionPerformed
         OrderDeleteSuccess.dispose();
     }//GEN-LAST:event_DismissOrderDeleteSuccessActionPerformed
+
+    private void DoneEditOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DoneEditOrderButtonActionPerformed
+        DefaultTableModel model = (DefaultTableModel)EditOrderTable.getModel();
+        try {
+            String sqlQuery;
+            PreparedStatement sqlStatement;
+            ResultSet rs;
+            for(int i = 0; i <= model.getRowCount()-1; i++) {
+                String productName = (String)model.getValueAt(i, 0);
+                sqlQuery = "SELECT getproductid(?);";
+                sqlStatement = database.getConn().prepareStatement(sqlQuery);
+                sqlStatement.setObject(1, productName);
+                rs = sqlStatement.executeQuery();
+                int productID  = 1;
+                while(rs.next()) {
+                    productID = rs.getInt(1);
+                }
+                sqlQuery = "SELECT updateorder(?, ?, ?);";
+                sqlStatement = database.getConn().prepareStatement(sqlQuery);
+                sqlStatement.setObject(1, ReceiptID);
+                sqlStatement.setObject(2, productID);
+                int productAmount = Integer.parseInt((String)model.getValueAt(i, 1));
+                sqlStatement.setObject(3, productAmount);
+                sqlStatement.execute();
+            }
+            // TODO: Update active receipts for new total
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        EditOrdersWindow.dispose();
+    }//GEN-LAST:event_DoneEditOrderButtonActionPerformed
+
+    private void EditOrdersWindowWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_EditOrdersWindowWindowClosing
+        DefaultTableModel model = (DefaultTableModel)EditOrderTable.getModel();
+        model.setRowCount(0);
+    }//GEN-LAST:event_EditOrdersWindowWindowClosing
 
     /**
      * @param args the command line arguments
@@ -619,6 +677,7 @@ public class App extends javax.swing.JFrame {
     
     static LocalPSQLDatabase database;
     static int OrderID = 1;
+    static int ReceiptID = 1;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane ActiveOrdersScrollPane;
@@ -631,12 +690,13 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JMenuItem DeleteOrderMenuButton;
     private javax.swing.JButton DismissOrderDeleteSuccess;
     private javax.swing.JButton DismissWarningNothingAdded;
+    private javax.swing.JButton DoneEditOrderButton;
     private javax.swing.JMenuItem EditOrderMenuButton;
+    private javax.swing.JTable EditOrderTable;
     private javax.swing.JFrame EditOrdersWindow;
     private javax.swing.JMenu NewMenu;
     private javax.swing.JMenuItem NewOrderButton;
     private javax.swing.JTable NewOrderTable;
-    private javax.swing.JTable NewOrderTable1;
     private javax.swing.JFrame NewOrderWindow;
     private javax.swing.JDialog OrderDeleteSuccess;
     private javax.swing.JButton ProceedOrderButton;
