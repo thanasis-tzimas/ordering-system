@@ -626,6 +626,33 @@ public class App extends javax.swing.JFrame {
                 sqlStatement.execute();
             }
             // TODO: Update active receipts for new total
+            sqlQuery = "SELECT * FROM getproductordersfromorderid(?);";
+            sqlStatement = database.getConn().prepareStatement(sqlQuery);
+            sqlStatement.setObject(1, ReceiptID);
+            rs = sqlStatement.executeQuery();
+            double totalCost = 0;
+            while(rs.next()) {
+                totalCost += rs.getInt("productamount") * rs.getDouble("productcost");
+            }
+            sqlQuery = "SELECT updateordertotal(?, ?);";
+            sqlStatement = database.getConn().prepareStatement(sqlQuery);
+            sqlStatement.setObject(1, ReceiptID);
+            sqlStatement.setObject(2, BigDecimal.valueOf(totalCost));
+            sqlStatement.execute();
+            
+            model = (DefaultTableModel)ActiveOrdersTable.getModel();
+            model.setRowCount(0);
+            sqlQuery = "select * from getallreceipts();";
+            sqlStatement = database.getConn().prepareCall(sqlQuery);
+            rs = sqlStatement.executeQuery();
+            while(rs.next()) {
+                model.addRow( new Object[] {
+                    rs.getString(1),
+                    rs.getString(2),
+                    rs.getString(3),
+                    rs.getString(4)
+            });
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
